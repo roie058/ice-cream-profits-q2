@@ -37,6 +37,8 @@ class IceCreamWindow(QWidget):
         self.slope = None
         self.intercept = None
         self.prediction_artists = []
+        self.hover_annotation = None
+        self.hover_temps = []
 
         self.about_window = None
         self.init_ui()
@@ -119,6 +121,7 @@ class IceCreamWindow(QWidget):
         self.figure = Figure(figsize=(8, 5), facecolor="#ffffff")
         self.ax = self.figure.add_subplot(111)
         self.canvas = FigureCanvasQTAgg(self.figure)
+        self.canvas.mpl_connect("motion_notify_event", self._on_mouse_move)
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
 
         graph_layout.addWidget(self.toolbar)
@@ -213,6 +216,7 @@ class IceCreamWindow(QWidget):
         self.slope = None
         self.intercept = None
         temps = self.get_display_temperatures()
+        self.hover_temps = temps
         self.ax.scatter(temps, self.revenues, color="#0284c7", s=1)
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
@@ -239,6 +243,19 @@ class IceCreamWindow(QWidget):
                 color="#b91c1c",
                 bbox=dict(boxstyle="round,pad=0.35", facecolor="#fef2f2", edgecolor="#fecaca"),
             )
+
+        self.hover_annotation = self.ax.annotate(
+            "",
+            xy=(0, 0),
+            xytext=(12, 12),
+            textcoords="offset points",
+            fontsize=9,
+            color="#0f172a",
+            bbox=dict(boxstyle="round,pad=0.35", facecolor="#ffffff", edgecolor="#94a3b8", alpha=0.95),
+            arrowprops=dict(arrowstyle="->", color="#64748b", lw=1),
+            zorder=10,
+        )
+        self.hover_annotation.set_visible(False)
 
         self.canvas.draw()
         self.update_stats()
@@ -309,6 +326,43 @@ class IceCreamWindow(QWidget):
         self.predict_temp_input.setSuffix(f" {unit}")
         self.predict_result_label.setText("Predicted Profit: --")
         self.plot_data()
+
+    def _on_mouse_move(self, event):
+        if self.hover_annotation is None:
+            return
+        if event.inaxes != self.ax or len(self.hover_temps) == 0:
+            if self.hover_annotation.get_visible():
+                self.hover_annotation.set_visible(False)
+                self.canvas.draw_idle()
+            return
+
+        points = np.column_stack((self.hover_temps, self.revenues))
+        pixel_coords = self.ax.transData.transform(points)
+        dists = np.hypot(pixel_coords[:, 0] - event.x, pixel_coords[:, 1] - event.y)
+        nearest_idx = int(np.argmin(dists))
+
+        if dists[nearest_idx] <= 12:
+            temp = self.hover_temps[nearest_idx]
+            rev = self.revenues[nearest_idx]
+            text = self.format_hover_tooltip(temp, rev)
+            if text:
+                self.hover_annotation.xy = (temp, rev)
+                self.hover_annotation.set_text(text)
+                # Flip tooltip left if near the right edge of the plot
+                xlim = self.ax.get_xlim()
+                offset_x = -135 if temp > (xlim[0] + xlim[1]) * 0.72 else 12
+                self.hover_annotation.set_position((offset_x, 12))
+                self.hover_annotation.set_visible(True)
+                self.canvas.draw_idle()
+                return
+
+        if self.hover_annotation.get_visible():
+            self.hover_annotation.set_visible(False)
+            self.canvas.draw_idle()
+
+    def format_hover_tooltip(self, temp: float, rev: float) -> str:
+        
+        return ""
             
         
         
