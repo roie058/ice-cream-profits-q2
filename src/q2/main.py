@@ -132,9 +132,11 @@ class IceCreamWindow(QWidget):
 
     def plot_data(self):
         self.ax.clear()
-        self.ax.scatter(self.temperatures, self.revenues, color="#0284c7")
-        self.ax.set_title("Ice Cream Sales Profits")
-        self.ax.set_xlabel("Temperature (Celcius)")
+        self.ax.scatter(self.temperatures, self.revenues, color="#0284c7",s=1)
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+        self.ax.set_title("Ice Cream Sales Profits vs. Outside Temperature")
+        self.ax.set_xlabel("Outside Temperature (C°)")
         self.ax.set_ylabel("Revenue (NIS)")
         self.canvas.draw()
 
