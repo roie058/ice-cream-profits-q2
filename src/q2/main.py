@@ -212,17 +212,18 @@ class IceCreamWindow(QWidget):
         self.prediction_artists = []
         self.slope = None
         self.intercept = None
-        self.ax.scatter(self.temperatures, self.revenues, color="#0284c7", s=1)
+        temps = self.get_display_temperatures()
+        self.ax.scatter(temps, self.revenues, color="#0284c7", s=1)
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
         self.ax.set_title("Ice Cream Sales Profits vs. Outside Temperature")
-        self.ax.set_xlabel("Outside Temperature (C°)")
+        self.ax.set_xlabel(f"Outside Temperature {self.unit_combo.currentText()}")
         self.ax.set_ylabel("Revenue ($)")
 
-        if len(self.temperatures) >= 2:
-            m, b = np.polyfit(self.temperatures, self.revenues, 1)
+        if len(temps) >= 2:
+            m, b = np.polyfit(temps, self.revenues, 1)
             self.slope, self.intercept = m, b
-            x_line = np.array([min(self.temperatures), max(self.temperatures)])
+            x_line = np.array([min(temps), max(temps)])
             y_line = m * x_line + b
             self.ax.plot(x_line, y_line, color="#ef4444", linewidth=2, label="Trendline")
 
@@ -243,19 +244,20 @@ class IceCreamWindow(QWidget):
         self.update_stats()
 
     def update_stats(self):
-        if len(self.temperatures)==0:
+        temps = self.get_display_temperatures()
+        if len(temps)==0:
             return
-        days = len(self.temperatures)
-        avg_temp = sum(self.temperatures)/days
+        days = len(temps)
+        avg_temp = sum(temps)/days
         peak_rev = max(self.revenues)
         avg_rev = sum(self.revenues)/days
         if days>=2:
-            r= np.corrcoef(self.temperatures, self.revenues)[0,1]
+            r= np.corrcoef(temps, self.revenues)[0,1]
             r2 = r**2
             self.r2_label.setText(f"R²: {r2:.4f}")
        
         self.count_label.setText(f"Days: {days}")
-        self.avg_temp_label.setText(f"Avg Temp: {avg_temp:.2f}")
+        self.avg_temp_label.setText(f"Avg Temp: {avg_temp:.2f} {self.unit_combo.currentText()}")
         self.avg_rev_label.setText(f"Avg Profit: {avg_rev:.2f}")
         self.peak_rev_label.setText(f"Peak Profit: {peak_rev:.2f}")
 
@@ -294,12 +296,22 @@ class IceCreamWindow(QWidget):
         self.highlight_prediction(temp, predicted_profit)
 
     def get_display_temperatures(self):
-        
+        unit = self.unit_combo.currentText()
+        if unit == "°F":
+            new_temp_list = []
+            for t in self.temperatures:
+                new_temp_list.append(float(t)*9/5+32)
+            return new_temp_list
         return self.temperatures
 
     def on_unit_changed(self):
+        unit = self.unit_combo.currentText()
+        self.predict_temp_input.setSuffix(f" {unit}")
+        self.predict_result_label.setText("Predicted Profit: --")
+        self.plot_data()
+            
         
-        pass
+        
         
 
 
