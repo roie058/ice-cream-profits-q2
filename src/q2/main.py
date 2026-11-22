@@ -1,5 +1,6 @@
 import os
 import sys
+import numpy as np 
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -132,12 +133,32 @@ class IceCreamWindow(QWidget):
 
     def plot_data(self):
         self.ax.clear()
-        self.ax.scatter(self.temperatures, self.revenues, color="#0284c7",s=1)
+        self.ax.scatter(self.temperatures, self.revenues, color="#0284c7", s=1)
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
         self.ax.set_title("Ice Cream Sales Profits vs. Outside Temperature")
         self.ax.set_xlabel("Outside Temperature (C°)")
-        self.ax.set_ylabel("Revenue (NIS)")
+        self.ax.set_ylabel("Revenue ($)")
+
+        if len(self.temperatures) >= 2:
+            m, b = np.polyfit(self.temperatures, self.revenues, 1)
+            x_line = np.array([min(self.temperatures), max(self.temperatures)])
+            y_line = m * x_line + b
+            self.ax.plot(x_line, y_line, color="#ef4444", linewidth=2, label="Trendline")
+
+            sign = "+" if b >= 0 else "-"
+            equation = f"y = {m:.2f}x {sign} {abs(b):.2f}"
+            self.ax.text(
+                0.05,
+                0.92,
+                equation,
+                transform=self.ax.transAxes,
+                fontsize=11,
+                fontweight="bold",
+                color="#b91c1c",
+                bbox=dict(boxstyle="round,pad=0.35", facecolor="#fef2f2", edgecolor="#fecaca"),
+            )
+
         self.canvas.draw()
 
 
