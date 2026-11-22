@@ -114,7 +114,7 @@ class IceCreamWindow(QWidget):
 
         main_layout.addWidget(graph_card, stretch=1)
 
-        # Bonus 2: Interactive Profit Predictor Bar
+        #Interactive Profit Predictor Bar
         predict_bar = QFrame(self)
         predict_bar.setObjectName("predict_bar")
         predict_layout = QHBoxLayout(predict_bar)
@@ -274,11 +274,13 @@ class IceCreamWindow(QWidget):
         self.canvas.draw()
 
     def on_predict_profit(self):
-        # TODO (Bonus 2): Check that self.slope is not None, read self.predict_temp_input.value(),
-        # calculate predicted_profit = self.slope * temp + self.intercept,
-        # update self.predict_result_label, and call self.highlight_prediction(temp, predicted_profit)
-        pass
-        
+        if self.slope is None or self.intercept is None:
+            self.predict_result_label.setText("Load a file first")
+            return
+        temp = self.predict_temp_input.value()
+        predicted_profit = self.slope * temp + self.intercept
+        self.predict_result_label.setText(f"Predicted Profit: ${predicted_profit:.2f}")
+        self.highlight_prediction(temp, predicted_profit)
         
 
 
