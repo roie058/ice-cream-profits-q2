@@ -67,6 +67,32 @@ class IceCreamWindow(QWidget):
 
         main_layout.addLayout(top_bar)
 
+        # Bonus 1: Live Summary Statistics & R² Bar
+        stats_bar = QFrame(self)
+        stats_bar.setObjectName("stats_bar")
+        stats_layout = QHBoxLayout(stats_bar)
+        stats_layout.setContentsMargins(14, 8, 14, 8)
+        stats_layout.setSpacing(16)
+
+        self.count_label = QLabel("Days: --", self)
+        self.avg_temp_label = QLabel("Avg Temp: --", self)
+        self.avg_rev_label = QLabel("Avg Profit: --", self)
+        self.peak_rev_label = QLabel("Peak Profit: --", self)
+        self.r2_label = QLabel("R²: --", self)
+
+        for lbl in (
+            self.count_label,
+            self.avg_temp_label,
+            self.avg_rev_label,
+            self.peak_rev_label,
+            self.r2_label,
+        ):
+            lbl.setProperty("class", "stat-label")
+            stats_layout.addWidget(lbl)
+
+        stats_layout.addStretch()
+        main_layout.addWidget(stats_bar)
+
         # Embedded matplotlib graph card (with zoom & save toolbar)
         graph_card = QFrame(self)
         graph_card.setObjectName("graph_card")
@@ -119,7 +145,7 @@ class IceCreamWindow(QWidget):
                 graph_lines = rows.readlines()
                 for i in range(1, len(graph_lines)):
                     temp, revenue = graph_lines[i].strip().split(",")
-                    print(f"temp: {temp}, revenue: {revenue}")
+
                     self.temperatures.append(float(temp))
                     self.revenues.append(float(revenue))
                 self.plot_data()    
@@ -160,6 +186,11 @@ class IceCreamWindow(QWidget):
             )
 
         self.canvas.draw()
+        self.update_stats()
+
+    def update_stats(self):
+       
+        pass
 
 
 def main():
