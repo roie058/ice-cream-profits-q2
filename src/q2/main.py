@@ -5,6 +5,7 @@ import numpy as np
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication,
+    QComboBox,
     QDoubleSpinBox,
     QFileDialog,
     QFrame,
@@ -62,6 +63,17 @@ class IceCreamWindow(QWidget):
         top_bar.addWidget(self.file_label)
 
         top_bar.addStretch()
+
+        unit_label = QLabel("Unit:", self)
+        unit_label.setProperty("class", "stat-label")
+        top_bar.addWidget(unit_label)
+
+        self.unit_combo = QComboBox(self)
+        self.unit_combo.setObjectName("unit_combo")
+        self.unit_combo.addItems(["°C", "°F"])
+        self.unit_combo.setCursor(Qt.PointingHandCursor)
+        self.unit_combo.currentIndexChanged.connect(self.on_unit_changed)
+        top_bar.addWidget(self.unit_combo)
 
         self.about_btn = QPushButton("About", self)
         self.about_btn.setObjectName("about_btn")
@@ -251,8 +263,7 @@ class IceCreamWindow(QWidget):
         self.predict_temp_input.interpretText()
         self.on_predict_profit()
 
-    def highlight_prediction(self, temp: float, predicted_profit: float):
-        """AI helper: draws a highlighted marker and dashed crosshairs for the predicted point."""
+    def highlight_prediction(self, temp: float, predicted_profit: float):    
         for artist in self.prediction_artists:
             artist.remove()
         self.prediction_artists.clear()
@@ -281,6 +292,14 @@ class IceCreamWindow(QWidget):
         predicted_profit = self.slope * temp + self.intercept
         self.predict_result_label.setText(f"Predicted Profit: ${predicted_profit:.2f}")
         self.highlight_prediction(temp, predicted_profit)
+
+    def get_display_temperatures(self):
+        
+        return self.temperatures
+
+    def on_unit_changed(self):
+        
+        pass
         
 
 

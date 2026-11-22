@@ -55,6 +55,23 @@ QDoubleSpinBox#predict_temp_input {
     min-width: 95px;
 }
 
+QComboBox#unit_combo {
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+    min-width: 64px;
+    font-weight: 600;
+}
+
+QComboBox#unit_combo QAbstractItemView {
+    background-color: #ffffff;
+    color: #0f172a;
+    selection-background-color: #e0f2fe;
+    selection-color: #0f172a;
+}
+
 QPushButton#predict_btn {
     background-color: #16a34a;
     color: #ffffff;
