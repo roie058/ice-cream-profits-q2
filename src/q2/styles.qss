@@ -39,10 +39,38 @@ QLabel#file_label {
     padding-left: 4px;
 }
 
-QFrame#stats_bar {
+QFrame#stats_bar,
+QFrame#predict_bar {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
+}
+
+QDoubleSpinBox#predict_temp_input {
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 5px 10px;
+    min-width: 95px;
+}
+
+QPushButton#predict_btn {
+    background-color: #16a34a;
+    color: #ffffff;
+    border: 1px solid #16a34a;
+    padding: 6px 14px;
+}
+
+QPushButton#predict_btn:hover {
+    background-color: #15803d;
+}
+
+QLabel#predict_result_label {
+    color: #15803d;
+    font-weight: 700;
+    font-size: 13px;
+    padding-left: 6px;
 }
 
 QLabel.stat-label {

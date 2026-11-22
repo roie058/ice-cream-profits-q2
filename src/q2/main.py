@@ -5,6 +5,7 @@ import numpy as np
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication,
+    QDoubleSpinBox,
     QFileDialog,
     QFrame,
     QHBoxLayout,
@@ -32,6 +33,9 @@ class IceCreamWindow(QWidget):
 
         self.temperatures = []
         self.revenues = []
+        self.slope = None
+        self.intercept = None
+        self.prediction_artists = []
 
         self.about_window = None
         self.init_ui()
@@ -67,7 +71,7 @@ class IceCreamWindow(QWidget):
 
         main_layout.addLayout(top_bar)
 
-        # Bonus 1: Live Summary Statistics & R² Bar
+        # Live Summary Statistics & R² Bar
         stats_bar = QFrame(self)
         stats_bar.setObjectName("stats_bar")
         stats_layout = QHBoxLayout(stats_bar)
@@ -109,6 +113,40 @@ class IceCreamWindow(QWidget):
         graph_layout.addWidget(self.canvas, stretch=1)
 
         main_layout.addWidget(graph_card, stretch=1)
+
+        # Bonus 2: Interactive Profit Predictor Bar
+        predict_bar = QFrame(self)
+        predict_bar.setObjectName("predict_bar")
+        predict_layout = QHBoxLayout(predict_bar)
+        predict_layout.setContentsMargins(14, 8, 14, 8)
+        predict_layout.setSpacing(10)
+
+        predict_prompt = QLabel("Predict Profit for Temp:", self)
+        predict_prompt.setProperty("class", "stat-label")
+        predict_layout.addWidget(predict_prompt)
+
+        self.predict_temp_input = QDoubleSpinBox(self)
+        self.predict_temp_input.setObjectName("predict_temp_input")
+        self.predict_temp_input.setRange(-20.0, 120.0)
+        self.predict_temp_input.setDecimals(1)
+        self.predict_temp_input.setSingleStep(0.5)
+        self.predict_temp_input.setValue(25.0)
+        self.predict_temp_input.setSuffix(" °C")
+        self.predict_temp_input.lineEdit().returnPressed.connect(self._handle_predict_trigger)
+        predict_layout.addWidget(self.predict_temp_input)
+
+        self.predict_btn = QPushButton("Predict", self)
+        self.predict_btn.setObjectName("predict_btn")
+        self.predict_btn.setCursor(Qt.PointingHandCursor)
+        self.predict_btn.clicked.connect(self._handle_predict_trigger)
+        predict_layout.addWidget(self.predict_btn)
+
+        self.predict_result_label = QLabel("Predicted Profit: --", self)
+        self.predict_result_label.setObjectName("predict_result_label")
+        predict_layout.addWidget(self.predict_result_label)
+
+        predict_layout.addStretch()
+        main_layout.addWidget(predict_bar)
 
     def load_stylesheet(self):
         qss_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "styles.qss")
@@ -159,6 +197,9 @@ class IceCreamWindow(QWidget):
 
     def plot_data(self):
         self.ax.clear()
+        self.prediction_artists = []
+        self.slope = None
+        self.intercept = None
         self.ax.scatter(self.temperatures, self.revenues, color="#0284c7", s=1)
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
@@ -168,6 +209,7 @@ class IceCreamWindow(QWidget):
 
         if len(self.temperatures) >= 2:
             m, b = np.polyfit(self.temperatures, self.revenues, 1)
+            self.slope, self.intercept = m, b
             x_line = np.array([min(self.temperatures), max(self.temperatures)])
             y_line = m * x_line + b
             self.ax.plot(x_line, y_line, color="#ef4444", linewidth=2, label="Trendline")
@@ -198,12 +240,44 @@ class IceCreamWindow(QWidget):
         if days>=2:
             r= np.corrcoef(self.temperatures, self.revenues)[0,1]
             r2 = r**2
-            self.r2_label.setText(f"R²: {r2:.3f}")
+            self.r2_label.setText(f"R²: {r2:.4f}")
        
         self.count_label.setText(f"Days: {days}")
         self.avg_temp_label.setText(f"Avg Temp: {avg_temp:.2f}")
         self.avg_rev_label.setText(f"Avg Profit: {avg_rev:.2f}")
         self.peak_rev_label.setText(f"Peak Profit: {peak_rev:.2f}")
+
+    def _handle_predict_trigger(self):
+        self.predict_temp_input.interpretText()
+        self.on_predict_profit()
+
+    def highlight_prediction(self, temp: float, predicted_profit: float):
+        """AI helper: draws a highlighted marker and dashed crosshairs for the predicted point."""
+        for artist in self.prediction_artists:
+            artist.remove()
+        self.prediction_artists.clear()
+
+        vline = self.ax.axvline(temp, color="#16a34a", linestyle="--", linewidth=1, alpha=0.7)
+        hline = self.ax.axhline(predicted_profit, color="#16a34a", linestyle="--", linewidth=1, alpha=0.7)
+        point = self.ax.scatter([temp], [predicted_profit], color="#16a34a", s=70, zorder=5, edgecolors="#ffffff", linewidths=1.5)
+        ann = self.ax.annotate(
+            f"({temp:.1f}, ${predicted_profit:.2f})",
+            xy=(temp, predicted_profit),
+            xytext=(10, -18),
+            textcoords="offset points",
+            fontsize=9,
+            fontweight="bold",
+            color="#15803d",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="#f0fdf4", edgecolor="#86efac"),
+        )
+        self.prediction_artists.extend([vline, hline, point, ann])
+        self.canvas.draw()
+
+    def on_predict_profit(self):
+        # TODO (Bonus 2): Check that self.slope is not None, read self.predict_temp_input.value(),
+        # calculate predicted_profit = self.slope * temp + self.intercept,
+        # update self.predict_result_label, and call self.highlight_prediction(temp, predicted_profit)
+        pass
         
         
 
