@@ -350,7 +350,7 @@ class IceCreamWindow(QWidget):
                 self.hover_annotation.set_text(text)
                 # Flip tooltip left if near the right edge of the plot
                 xlim = self.ax.get_xlim()
-                offset_x = -135 if temp > (xlim[0] + xlim[1]) * 0.72 else 12
+                offset_x = -220 if temp > (xlim[0] + xlim[1]) * 0.65 else 12
                 self.hover_annotation.set_position((offset_x, 12))
                 self.hover_annotation.set_visible(True)
                 self.canvas.draw_idle()
@@ -361,8 +361,16 @@ class IceCreamWindow(QWidget):
             self.canvas.draw_idle()
 
     def format_hover_tooltip(self, temp: float, rev: float) -> str:
-        
-        return ""
+        unit = self.unit_combo.currentText()
+        if self.slope is not None and self.intercept is not None:
+            expected = self.slope * temp + self.intercept
+            diff = rev - expected
+            sign = "+"
+            if diff<0:
+                sign = '-'
+            return f"Temp: {temp:.1f} {unit}\nProfit: ${rev:.2f} ({sign}${abs(diff):.2f} distance from trend)" 
+       
+        return f"Temp: {temp:.1f} {unit}\nProfit: ${rev:.2f}"      
             
         
         

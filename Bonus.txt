@@ -1,0 +1,9 @@
+Bonus Features Added (Ice Cream Sales Profits):
+1. Live Summary Statistics & R² Bar:
+   Displays total days loaded, average temperature, average profit, peak profit, and R² above the graph.
+2.Profit Predictor:
+   Lets the user enter any temperature to predict expected profit.
+3. Temperature Unit Toggle (°C / °F):
+   Allows switching between Celsius and Fahrenheit
+4. Interactive Point Hover Tooltip:
+   Hovering over any scatter point displays a floating tooltip showing that day's temperature and actual profit.
