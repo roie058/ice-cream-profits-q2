@@ -189,8 +189,23 @@ class IceCreamWindow(QWidget):
         self.update_stats()
 
     def update_stats(self):
+        if len(self.temperatures)==0:
+            return
+        days = len(self.temperatures)
+        avg_temp = sum(self.temperatures)/days
+        peak_rev = max(self.revenues)
+        avg_rev = sum(self.revenues)/days
+        if days>=2:
+            r= np.corrcoef(self.temperatures, self.revenues)[0,1]
+            r2 = r**2
+            self.r2_label.setText(f"R²: {r2:.3f}")
        
-        pass
+        self.count_label.setText(f"Days: {days}")
+        self.avg_temp_label.setText(f"Avg Temp: {avg_temp:.2f}")
+        self.avg_rev_label.setText(f"Avg Profit: {avg_rev:.2f}")
+        self.peak_rev_label.setText(f"Peak Profit: {peak_rev:.2f}")
+        
+        
 
 
 def main():
