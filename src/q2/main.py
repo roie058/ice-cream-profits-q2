@@ -29,7 +29,8 @@ class IceCreamWindow(QWidget):
         self.setWindowTitle("Ice Cream Sales Profits")
         self.resize(900, 620)
 
-        # TODO (Step 3): Initialize your two data lists here (e.g., temperatures and revenues)
+        self.temperatures = []
+        self.revenues = []
 
         self.about_window = None
         self.init_ui()
@@ -107,16 +108,34 @@ class IceCreamWindow(QWidget):
         self.about_window.activateWindow()
 
     def on_load_file(self, file_path: str):
-        #Open file_path, read the CSV data into your two lists, and call self.plot_data()
-        pass
+        if file_path == '':
+            return
+
+        self.temperatures = []
+        self.revenues = []
+        try:
+            with open(file_path, "r") as rows:
+                graph_lines = rows.readlines()
+                for i in range(1, len(graph_lines)):
+                    temp, revenue = graph_lines[i].strip().split(",")
+                    print(f"temp: {temp}, revenue: {revenue}")
+                    self.temperatures.append(float(temp))
+                    self.revenues.append(float(revenue))
+                self.plot_data()    
+        except Exception:
+            print(f"Error reading file: {file_path}")
+                    
+                    
+
+                
+        
 
     def plot_data(self):
-        #Replace this temporary graph with the real scatter plot
         self.ax.clear()
-        self.ax.plot([1, 2, 3, 4], [10, 20, 25, 30], marker="o", color="#0284c7")
-        self.ax.set_title("Temporary Graph — Load Ice Cream.csv")
-        self.ax.set_xlabel("X (Temp)")
-        self.ax.set_ylabel("Y (Profit)")
+        self.ax.scatter(self.temperatures, self.revenues, color="#0284c7")
+        self.ax.set_title("Ice Cream Sales Profits")
+        self.ax.set_xlabel("Temperature (Celcius)")
+        self.ax.set_ylabel("Revenue (NIS)")
         self.canvas.draw()
 
 
