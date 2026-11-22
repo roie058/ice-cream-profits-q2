@@ -1,0 +1,70 @@
+QWidget#IceCreamWindow {
+    background-color: #f8fafc;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    color: #0f172a;
+}
+
+QPushButton {
+    background-color: #ffffff;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+QPushButton#load_btn {
+    background-color: #0284c7;
+    color: #ffffff;
+    border: 1px solid #0284c7;
+}
+
+QPushButton#load_btn:hover {
+    background-color: #0369a1;
+}
+
+QLabel {
+    color: #0f172a;
+}
+
+QLabel#file_label {
+    color: #475569;
+    font-weight: 500;
+    padding-left: 4px;
+}
+
+QFrame#graph_card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+QToolBar {
+    background-color: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 2px 4px;
+    spacing: 4px;
+}
+
+QToolButton {
+    background-color: transparent;
+    color: #0f172a;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QToolButton:hover {
+    background-color: #e2e8f0;
+}
+
+QToolButton:checked {
+    background-color: #bae6fd;
+}
